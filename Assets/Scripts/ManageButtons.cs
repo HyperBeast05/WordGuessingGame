@@ -23,7 +23,7 @@ public class ManageButtons : MonoBehaviour
     }
     private void Start()
     {
-        
+
     }
     public void StartGame() => SceneManager.LoadScene("Chapter_1");
     public void QuitApplication() => Application.Quit();
@@ -40,51 +40,57 @@ public class ManageButtons : MonoBehaviour
                 if (canvas.transform.Find("StartButton").TryGetComponent<Button>(out var startBTN))
                 {
                     startBTN.onClick.RemoveAllListeners();
-                    startBTN.onClick.AddListener(()=>StartGame());
+                    startBTN.onClick.AddListener(() => StartGame());
                 }
                 if (canvas.transform.Find("QuitButton").TryGetComponent<Button>(out var quitBTN))
                 {
                     quitBTN.onClick.RemoveAllListeners();
-                    quitBTN.onClick.AddListener(() => StartGame());
+                    quitBTN.onClick.AddListener(() => QuitApplication());
                 }
 
             }
         }
-        GameObject panels = GameObject.Find("Panels");
-        if (panels != null)
-        {
-            if (panels.transform.Find("LosePanel/RestartButton").TryGetComponent<Button>(out var button))
+
+        if (SceneManager.GetActiveScene().name == "Chapter_1")
+        {   
+            GameObject panels = GameObject.Find("Panels");
+            if (panels != null)
             {
-                Debug.Log(button.name);
-                button.onClick.RemoveAllListeners();
-                button.onClick.AddListener(()=>RestartButton());
+                if (panels.transform.Find("LosePanel/RestartButton").TryGetComponent<Button>(out var button))
+                {
+                    button.onClick.RemoveAllListeners();
+                    button.onClick.AddListener(() => RestartButton());
+                }
+                if (panels.transform.Find("LosePanel/MainMenuButton").TryGetComponent<Button>(out var mainMenuButton))
+                {
+                    mainMenuButton.onClick.RemoveAllListeners();
+                    mainMenuButton.onClick.AddListener(() => GoToMainMenu());
+                }
+                if (panels.transform.Find("WinPanel/RestartButton").TryGetComponent<Button>(out var winButton))
+                {
+                    winButton.onClick.RemoveAllListeners();
+                    winButton.onClick.AddListener(() => RestartButton());
+                }
+                if (panels.transform.Find("WinPanel/MainMenuButton").TryGetComponent<Button>(out var winMainMenuBTN))
+                {
+                    winMainMenuBTN.onClick.RemoveAllListeners();
+                    winMainMenuBTN.onClick.AddListener(() => GoToMainMenu());
+                }
             }
-            if (panels.transform.Find("LosePanel/MainMenuButton").TryGetComponent<Button>(out var mainMenuButton))
+            if (GameObject.Find("BackButton").TryGetComponent<Button>(out var backBTN))
             {
-                mainMenuButton.onClick.RemoveAllListeners();
-                mainMenuButton.onClick.AddListener(() => GoToMainMenu());
-            }
-            if (panels.transform.Find("WinPanel/RestartButton").TryGetComponent<Button>(out var winButton))
-            {
-                winButton.onClick.RemoveAllListeners();
-                winButton.onClick.AddListener(() => RestartButton());
-            }
-            if (panels.transform.Find("WinPanel/MainMenuButton").TryGetComponent<Button>(out var winMainMenuBTN))
-            {
-                winMainMenuBTN.onClick.RemoveAllListeners();
-                winMainMenuBTN.onClick.AddListener(()=>GoToMainMenu());
+                backBTN.onClick.RemoveAllListeners();
+                backBTN.onClick.AddListener(() => GoToMainMenu());
             }
         }
-
-
     }
 
-    private void OnSceneLoad(Scene scene ,LoadSceneMode mode)
+    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
         SetUPButtons();
     }
-    private void OnEnable()=> SceneManager.sceneLoaded += OnSceneLoad;
-    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoad;        
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoad;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoad;
 
-    
+
 }

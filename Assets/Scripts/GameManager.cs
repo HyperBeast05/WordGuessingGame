@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject m_letterPrefab;
     [SerializeField] private Transform m_centre;
+    [SerializeField] private Button m_alphabetButton;
+    [SerializeField] private Transform m_buttonParent;
     [SerializeField] private TextMeshProUGUI m_currentTimeTMP;
     [SerializeField] private TextMeshProUGUI m_BestTimeTMP;
     [SerializeField] private TextMeshProUGUI m_AttemptsTMP;
@@ -26,7 +30,7 @@ public class GameManager : MonoBehaviour
     private int m_noOfAttempts;
     private int m_maxAttempts = 10;
 
-
+    
     void Start()
     {
         m_losePanel.SetActive(false);
@@ -37,12 +41,13 @@ public class GameManager : MonoBehaviour
 
         InitGame();
         InitLetters();
+        CreateKeyBoard();
     }
 
     void Update()
     {
         UpdateTime();
-        CheckKeyBoard();
+        //CheckKeyBoard();
         CheckPuzzleSolved();
     }
 
@@ -94,12 +99,50 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void CreateKeyBoard()
+    {
+        for (char letter = 'A'; letter <= 'Z'; letter++)
+        {
+            Button alphabetBTN = Instantiate(m_alphabetButton, m_buttonParent);
+            alphabetBTN.name = $"Button_{letter}";
+            var buttonTMP = alphabetBTN.GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonTMP != null)
+                buttonTMP.text = letter.ToString();
+            if (alphabetBTN != null)
+            {
+                char capturedLetter = letter;
+                alphabetBTN.onClick.RemoveAllListeners();
+                alphabetBTN.onClick.AddListener(()=>OnClickAlphabet(capturedLetter));
+                
+            }
+        }
+    }
+
+    private void OnClickAlphabet(char letterPressed)
+    {
+        bool correctGuess = false;
+        for (int i = 0; i < m_lengthOfWordToGuess; i++)
+        {
+            if (!m_isLetterGuessed[i] && m_lettersToGuess[i] == letterPressed)
+            {
+                GameObject.Find("Letter " + (i + 1)).GetComponentInChildren<TextMeshProUGUI>().text = letterPressed.ToString();
+                m_isLetterGuessed[i] = true;
+                correctGuess = true;
+                break;
+            }
+        }
+        if (!correctGuess)
+        {
+            UpdateAttempts();            
+        }
+    }
+
     private string PickWordFromFile()
     {
         TextAsset Word = Resources.Load("WordsFile") as TextAsset;
         string s = Word.text;
         string[] words = s.Split('\n').Select(w => w.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
-        int randomWord = Random.Range(0, words.Length + 1);
+        int randomWord = Random.Range(0, words.Length + 1); Debug.Log(words[randomWord]);
         return words[randomWord];
     }
     private void UpdateTime()
